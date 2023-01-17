@@ -1,0 +1,5 @@
+dataCsv/
+.token
+*.h5
+priceData/
+cryptoTrader.code-workspace

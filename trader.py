@@ -10,6 +10,14 @@ def get_dataframe(file_name) -> pd.DataFrame:
     df = pd.read_csv(f'dataCsv/{file_name}')
     return df
 
+def check(price1, price2):
+    if price1 > price2:
+        return [-1, 1]
+    elif price1 < price2:
+        return [1, -1]
+    else:
+        return [0, 0]
+
 class desition_maker:
 
     def __init__(self):
@@ -39,16 +47,17 @@ class desition_maker:
 
 
 dMaker = desition_maker()
-model = load_model('main.h5')
+model = load_model('main.h5', compile=False)
 predicciones = {}
+operaciones = {}
 
 for file in files:
     
     lista = file.split('_')
     dataFrame = get_dataframe(file)
 
-    data1 = getData(lista[0])
-    data2 = getData(lista[1])
+    data1 = getData(lista[0], '30m')
+    data2 = getData(lista[1], '30m')
     
     price1 = data1['price']
     price2 = data2['price']
@@ -64,6 +73,11 @@ for file in files:
         dMaker.add_data(data1['volume'], data2['volume'], data1['adx'], data2['adx'], data1['rsi'], data2['rsi'], spread_std)
         prediccion = dMaker.predict()
     
-    print(file, int(prediccion))
+    if prediccion == 1:
+        operaciones[str(lista[0])+','+str(lista[1])] = check(price1/float(dataFrame['ratio'][0]), price2)
+
     name = str(lista[0])+'_'+str(lista[1])
+    print(name, int(prediccion))
     predicciones[name] = int(prediccion)
+print(predicciones)
+print(operaciones)
